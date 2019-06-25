@@ -1,5 +1,36 @@
 import jamo from '../src/jamo'
 
+describe('isChoseong 함수는 초성 여부를 확인한다', () => {
+  test('모든 문자가 초성일 경우에만 true를 돌려준다', () => {
+    expect(jamo.isChoseong('abc')).toBeFalsy()
+    expect(jamo.isChoseong('ᄀaᄂbᄃ')).toBeFalsy()
+    expect(jamo.isChoseong('ᄀᄂᄃ')).toBeTruthy()
+  })
+
+  test('여러 문자열 인자도 처리한다', () => {
+    expect(jamo.isChoseong('ᄀ', 'ᄂ', 'ᄃ')).toBeTruthy()
+    expect(jamo.isChoseong('ᄀᄂᄃ', 'ᇀᇁᇂ')).toBeTruthy()
+  })
+})
+
+describe('isJungseong 함수는 중성 여부를 확인한다', () => {
+  test('모든 문자가 중성일 경우에만 true를 돌려준다', () => {
+    expect(jamo.isJungseong('abc')).toBeFalsy()
+    expect(jamo.isJungseong('ᅡaᅩbᅳcᅵ')).toBeFalsy()
+    expect(jamo.isJungseong('ᅡᅩᅳᅵ')).toBeTruthy()
+    expect(jamo.isJungseong('ᅡ', 'ᅩ', 'ᅳ', 'ᅵ')).toBeTruthy()
+  })
+})
+
+describe('isJongseong 함수는 종성 여부를 확인한다', () => {
+  test('모든 문자가 종성일 경우에만 true를 돌려준다', () => {
+    expect(jamo.isJongseong('abc')).toBeFalsy()
+    expect(jamo.isJongseong('ᄀᄂᄃ')).toBeFalsy()
+    expect(jamo.isJongseong('ᆨ', 'ᆫ', 'ᆮ')).toBeTruthy()
+    expect(jamo.isJongseong('ᆨᆫᆮ')).toBeTruthy()
+  })
+})
+
 describe('isSyllable 함수는 한글 음절 여부를 확인한다', () => {
   test('모든 문자가 한글 음절일 경우에만 true를 돌려준다', () => {
     expect(jamo.isSyllable('abc')).toBeFalsy()

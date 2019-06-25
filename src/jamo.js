@@ -56,16 +56,35 @@ function decomposeAsCompat (text) {
   })
 }
 
-function isSyllable (text) {
+function inRangeOf (text, start, end) {
   return Array.from(text).every(ch => {
     const codePoint = ch.codePointAt(0)
 
-    return codePoint >= 0xAC00 && codePoint <= 0xD7AF
+    return codePoint >= start && codePoint <= end
   })
+}
+
+function isChoseong (text) {
+  return inRangeOf(text, 0x1100, 0x1112)
+}
+
+function isJongseong (text) {
+  return inRangeOf(text, 0x11A8, 0x11C2)
+}
+
+function isJungseong (text) {
+  return inRangeOf(text, 0x1161, 0x1175)
+}
+
+function isSyllable (text) {
+  return inRangeOf(text, 0xAC00, 0xD7AF)
 }
 
 export default {
   decompose,
   decomposeAsCompat,
+  isChoseong,
+  isJongseong,
+  isJungseong,
   isSyllable
 }
