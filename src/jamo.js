@@ -1,5 +1,9 @@
 function decompose (text) {
   return Array.from(text).map(ch => {
+    if (!isSyllable(ch)) {
+      return [ch]
+    }
+
     const offset = ch.codePointAt(0) - 0xAC00
     const jongseong = offset % 28
     const jungseong = ((offset - jongseong) / 28) % 21
@@ -17,6 +21,15 @@ function decompose (text) {
   })
 }
 
+function isSyllable (text) {
+  return Array.from(text).every(ch => {
+    const codePoint = ch.codePointAt(0)
+
+    return codePoint >= 0xAC00 && codePoint <= 0xD7AF
+  })
+}
+
 export default {
-  decompose
+  decompose,
+  isSyllable
 }
