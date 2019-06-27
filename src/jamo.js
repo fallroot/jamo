@@ -1,5 +1,3 @@
-const COMPAT_CONSONANTS = ['ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
-const COMPAT_VOWELS = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
 const COMPAT_TO_CHOSEUNG = [0, 1, -1, 2, -1, -1, 3, 4, 5, -1, -1, -1, -1, -1, -1, -1, 6, 7, 8, -1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 const COMPAT_TO_JONGSEUNG = [0, 1, 2, 3, 4, 5, 6, -1, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, -1, 17, 18, 19, 20, 21, -1, 22, 23, 24, 25, 26]
 const CHOSEONG_TO_COMPAT = [0, 1, 3, 6, 7, 8, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
@@ -207,12 +205,12 @@ function decompose (text) {
 function decomposeAsCompat (text) {
   return decomposeWith(text, offsets => {
     const result = [
-      COMPAT_CONSONANTS[CHOSEONG_TO_COMPAT[offsets.choseong]],
-      COMPAT_VOWELS[offsets.jungseong]
+      String.fromCodePoint(0x3131 + CHOSEONG_TO_COMPAT[offsets.choseong]),
+      String.fromCodePoint(0x314F + offsets.jungseong)
     ]
 
     if (offsets.jongseong) {
-      result.push(COMPAT_CONSONANTS[JONGSEONG_TO_COMPAT[offsets.jongseong - 1]])
+      result.push(String.fromCodePoint(0x3131 + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]))
     }
 
     return result
