@@ -177,44 +177,37 @@ function decomposeAsOffset (text) {
   }
 }
 
-function decomposeWith (text, callback) {
+function decomposeWith (text, getter) {
   return Array.from(text).map(ch => {
     if (!isSyllable(ch)) {
       return [ch]
     }
 
-    return callback(decomposeAsOffset(ch))
+    const offsets = decomposeAsOffset(ch)
+    const codePoints = getter(offsets)
+
+    if (!offsets.jongseong) {
+      codePoints.pop()
+    }
+
+    return codePoints.map(cp => String.fromCodePoint(cp))
   })
 }
 
 function decompose (text) {
-  return decomposeWith(text, offsets => {
-    const result = [
-      String.fromCodePoint(0x1100 + offsets.choseong),
-      String.fromCodePoint(0x1161 + offsets.jungseong)
-    ]
-
-    if (offsets.jongseong) {
-      result.push(String.fromCodePoint(0x11A8 + offsets.jongseong - 1))
-    }
-
-    return result
-  })
+  return decomposeWith(text, offsets => [
+    0x1100 + offsets.choseong,
+    0x1161 + offsets.jungseong,
+    0x11A8 + offsets.jongseong - 1
+  ])
 }
 
 function decomposeAsCompat (text) {
-  return decomposeWith(text, offsets => {
-    const result = [
-      String.fromCodePoint(0x3131 + CHOSEONG_TO_COMPAT[offsets.choseong]),
-      String.fromCodePoint(0x314F + offsets.jungseong)
-    ]
-
-    if (offsets.jongseong) {
-      result.push(String.fromCodePoint(0x3131 + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]))
-    }
-
-    return result
-  })
+  return decomposeWith(text, offsets => [
+    0x3131 + CHOSEONG_TO_COMPAT[offsets.choseong],
+    0x314F + offsets.jungseong,
+    0x3131 + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]
+  ])
 }
 
 function inRangeOf (text, start, end) {
