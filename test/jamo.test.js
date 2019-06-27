@@ -57,6 +57,23 @@ describe('compose 함수는 초/중/종성을 받아 한글 음절로 합성한�
   })
 })
 
+describe('composeWithCompat 함수는 호환성 자모를 받아 한글 음절로 합성한다', () => {
+  test('한글 음절로 합성할 수 없는 문자는 그대로 돌려준다', () => {
+    expect(jamo.composeWithCompat('a', 'b', 'c')).toEqual('abc')
+    expect(jamo.composeWithCompat('ㄱ', 'ㄴ', 'ㄷ')).toEqual('ㄱㄴㄷ')
+  })
+
+  test('초/중/종성을 받침이 있는 한글 음절로 합성한다', () => {
+    expect(jamo.composeWithCompat('ㄱ', 'ㅏ', 'ㄱ')).toEqual('각')
+    expect(jamo.composeWithCompat('ㅎ', 'ㅣ', 'ㅎ')).toEqual('힣')
+  })
+
+  test('초/중성을 받침이 없는 한글 음절로 합성한다', () => {
+    expect(jamo.composeWithCompat('ㄱ', 'ㅏ')).toEqual('가')
+    expect(jamo.composeWithCompat('ㅎ', 'ㅣ')).toEqual('히')
+  })
+})
+
 describe('decompose 함수는 한글 음절을 자모 단위로 분해한다', () => {
   test('한글 음절이 아닌 문자는 그대로 돌려준다', () => {
     expect(jamo.decompose('abc')).toEqual([['a'], ['b'], ['c']])
