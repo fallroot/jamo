@@ -2,6 +2,18 @@ const COMPAT_TO_CHOSEUNG = [0, 1, -1, 2, -1, -1, 3, 4, 5, -1, -1, -1, -1, -1, -1
 const COMPAT_TO_JONGSEUNG = [0, 1, 2, 3, 4, 5, 6, -1, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, -1, 17, 18, 19, 20, 21, -1, 22, 23, 24, 25, 26]
 const CHOSEONG_TO_COMPAT = [0, 1, 3, 6, 7, 8, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 const JONGSEONG_TO_COMPAT = [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29]
+const CHOSEONG_FIRST = 0x1100
+const CHOSEONG_LAST = 0x1112
+const JUNGSEONG_FIRST = 0x1161
+const JUNGSEONG_LAST = 0x1175
+const JONGSEONG_FIRST = 0x11A8
+const JONGSEONG_LAST = 0x11C2
+const COMPAT_CONSONANT_FIRST = 0x3131
+const COMPAT_CONSONANT_LAST = 0x314E
+const COMPAT_VOWEL_FIRST = 0x314F
+const COMPAT_VOWEL_LAST = 0x3163
+const SYLLABLE_FIRST = 0xAC00
+const SYLLABLE_LAST = 0xD7AF
 
 function compose (...args) {
   const result = []
@@ -62,10 +74,10 @@ function composeCharacter (chars) {
     return chars
   }
 
-  const choseong = chars[0].codePointAt(0) - 0x1100
-  const jungseong = chars[1].codePointAt(0) - 0x1161
-  const jongseong = chars.length > 2 ? chars[2].codePointAt(0) - 0x11A8 + 1 : 0
-  const codePoint = 0xAC00 + choseong * 21 * 28 + jungseong * 28 + jongseong
+  const choseong = chars[0].codePointAt(0) - CHOSEONG_FIRST
+  const jungseong = chars[1].codePointAt(0) - JUNGSEONG_FIRST
+  const jongseong = chars.length > 2 ? chars[2].codePointAt(0) - JONGSEONG_FIRST + 1 : 0
+  const codePoint = SYLLABLE_FIRST + choseong * 21 * 28 + jungseong * 28 + jongseong
 
   return String.fromCodePoint(codePoint)
 }
@@ -141,31 +153,25 @@ function composeWithCompat (...args) {
 }
 
 function getChoseongFromCompat (text) {
-  if (!isCompatConsonant(text)) {
-    return
+  if (isCompatConsonant(text)) {
+    return String.fromCodePoint(CHOSEONG_FIRST + COMPAT_TO_CHOSEUNG[text.codePointAt(0) - COMPAT_CONSONANT_FIRST])
   }
-
-  return String.fromCodePoint(0x1100 + COMPAT_TO_CHOSEUNG[text.codePointAt(0) - 0x3131])
 }
 
 function getJongseongFromCompat (text) {
-  if (!isCompatConsonant(text)) {
-    return
+  if (isCompatConsonant(text)) {
+    return String.fromCodePoint(JONGSEONG_FIRST + COMPAT_TO_JONGSEUNG[text.codePointAt(0) - COMPAT_CONSONANT_FIRST])
   }
-
-  return String.fromCodePoint(0x11A8 + COMPAT_TO_JONGSEUNG[text.codePointAt(0) - 0x3131])
 }
 
 function getJungseongFromCompat (text) {
-  if (!isCompatVowel(text)) {
-    return
+  if (isCompatVowel(text)) {
+    return String.fromCodePoint(JUNGSEONG_FIRST + text.codePointAt(0) - COMPAT_VOWEL_FIRST)
   }
-
-  return String.fromCodePoint(0x1161 + text.codePointAt(0) - 0x314F)
 }
 
 function decomposeAsOffset (text) {
-  const offset = text.codePointAt(0) - 0xAC00
+  const offset = text.codePointAt(0) - SYLLABLE_FIRST
   const jongseong = offset % 28
   const jungseong = ((offset - jongseong) / 28) % 21
   const choseong = (((offset - jongseong) / 28) - jungseong) / 21
@@ -196,17 +202,17 @@ function decomposeWith (text, getter) {
 
 function decompose (text) {
   return decomposeWith(text, offsets => [
-    0x1100 + offsets.choseong,
-    0x1161 + offsets.jungseong,
-    0x11A8 + offsets.jongseong - 1
+    CHOSEONG_FIRST + offsets.choseong,
+    JUNGSEONG_FIRST + offsets.jungseong,
+    JONGSEONG_FIRST + offsets.jongseong - 1
   ])
 }
 
 function decomposeAsCompat (text) {
   return decomposeWith(text, offsets => [
-    0x3131 + CHOSEONG_TO_COMPAT[offsets.choseong],
-    0x314F + offsets.jungseong,
-    0x3131 + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]
+    COMPAT_CONSONANT_FIRST + CHOSEONG_TO_COMPAT[offsets.choseong],
+    COMPAT_VOWEL_FIRST + offsets.jungseong,
+    COMPAT_CONSONANT_FIRST + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]
   ])
 }
 
@@ -219,19 +225,19 @@ function inRangeOf (text, start, end) {
 }
 
 function isChoseong (text) {
-  return inRangeOf(text, 0x1100, 0x1112)
+  return inRangeOf(text, CHOSEONG_FIRST, CHOSEONG_LAST)
 }
 
 function isCompat (text) {
-  return inRangeOf(text, 0x3131, 0x3163)
+  return inRangeOf(text, COMPAT_CONSONANT_FIRST, COMPAT_VOWEL_LAST)
 }
 
 function isCompatConsonant (text) {
-  return inRangeOf(text, 0x3131, 0x314E)
+  return inRangeOf(text, COMPAT_CONSONANT_FIRST, COMPAT_CONSONANT_LAST)
 }
 
 function isCompatVowel (text) {
-  return inRangeOf(text, 0x314F, 0x3163)
+  return inRangeOf(text, COMPAT_VOWEL_FIRST, COMPAT_VOWEL_LAST)
 }
 
 function isComposable (text) {
@@ -239,15 +245,15 @@ function isComposable (text) {
 }
 
 function isJongseong (text) {
-  return inRangeOf(text, 0x11A8, 0x11C2)
+  return inRangeOf(text, JONGSEONG_FIRST, JONGSEONG_LAST)
 }
 
 function isJungseong (text) {
-  return inRangeOf(text, 0x1161, 0x1175)
+  return inRangeOf(text, JUNGSEONG_FIRST, JUNGSEONG_LAST)
 }
 
 function isSyllable (text) {
-  return inRangeOf(text, 0xAC00, 0xD7AF)
+  return inRangeOf(text, SYLLABLE_FIRST, SYLLABLE_LAST)
 }
 
 export default {
