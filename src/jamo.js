@@ -188,20 +188,12 @@ function isChoseong (text) {
   return inRangeOf(text, CHOSEONG_FIRST, CHOSEONG_LAST)
 }
 
-function isCompat (text) {
-  return inRangeOf(text, COMPAT_CONSONANT_FIRST, COMPAT_VOWEL_LAST)
-}
-
 function isCompatConsonant (text) {
   return inRangeOf(text, COMPAT_CONSONANT_FIRST, COMPAT_CONSONANT_LAST)
 }
 
 function isCompatVowel (text) {
   return inRangeOf(text, COMPAT_VOWEL_FIRST, COMPAT_VOWEL_LAST)
-}
-
-function isComposable (text) {
-  return isChoseong(text) || isJungseong(text) || isJongseong(text)
 }
 
 function isJongseong (text) {
