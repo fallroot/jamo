@@ -16,54 +16,39 @@ const SYLLABLE_FIRST = 0xAC00
 const SYLLABLE_LAST = 0xD7AF
 
 function compose (...args) {
+  const chars = Array.from(args)
+  const size = chars.length
+  const standbys = []
   const result = []
-  const chars = []
-  let step = 0
+  let index = 0
 
-  args.forEach(ch => {
-    if (!isComposable(ch)) {
-      step = 0
-      result.push(ch)
-      return
-    }
+  while (index < size) {
+    let curr = chars[index]
 
-    if (step === 0) {
-      if (isChoseong(ch)) {
-        chars.push(ch)
-        step += 1
-      } else {
-        result.push(ch)
-        step = 0
+    if (isChoseong(curr)) {
+      standbys.push(curr)
+      curr = chars[index + 1]
+
+      if (isJungseong(curr)) {
+        standbys.push(curr)
+        index += 1
+        curr = chars[index + 1]
+
+        if (isJongseong(curr)) {
+          standbys.push(curr)
+          index += 1
+        }
       }
-      return
     }
 
-    if (step === 1) {
-      if (isJungseong(ch)) {
-        chars.push(ch)
-        step += 1
-      } else {
-        result.push(ch)
-        step = 0
-      }
-      return
+    if (standbys.length) {
+      result.push(composeCharacter(standbys))
+      standbys.length = 0
+    } else {
+      result.push(curr)
     }
 
-    if (step === 2) {
-      if (isJongseong(ch)) {
-        chars.push(ch)
-        result.push(composeCharacter(chars))
-      } else {
-        result.push(composeCharacter(chars))
-        result.push(ch)
-      }
-      chars.length = 0
-      step = 0
-    }
-  })
-
-  if (chars.length) {
-    result.push(composeCharacter(chars))
+    index += 1
   }
 
   return result.join('')
@@ -71,7 +56,7 @@ function compose (...args) {
 
 function composeCharacter (chars) {
   if (chars.length < 2) {
-    return chars
+    return chars.join('')
   }
 
   const choseong = chars[0].codePointAt(0) - CHOSEONG_FIRST
@@ -83,70 +68,43 @@ function composeCharacter (chars) {
 }
 
 function composeWithCompat (...args) {
-  const chars = []
-  const jamos = []
+  const chars = Array.from(args)
+  const compats = []
+  const standbys = []
+  let index = 0
   let result = []
-  let step = 0
 
-  args.forEach(ch => {
-    if (!isCompat(ch)) {
-      step = 0
-      result.push(ch)
-      return
-    }
+  while (index < chars.length) {
+    let curr = chars[index]
 
-    if (step === 0) {
-      if (isCompatConsonant(ch)) {
-        chars.push(ch)
-        jamos.push(getChoseongFromCompat(ch))
-        step += 1
-      } else {
-        if (chars.length) {
-          result = result.concat(chars)
+    if (isCompatConsonant(curr)) {
+      compats.push(curr)
+      standbys.push(getChoseongFromCompat(curr))
+      curr = chars[index + 1]
+
+      if (isCompatVowel(curr)) {
+        standbys.push(getJungseongFromCompat(curr))
+        index += 1
+        curr = chars[index + 1]
+
+        if (isCompatConsonant(curr)) {
+          standbys.push(getJongseongFromCompat(curr))
+          index += 1
         }
-        result.push(ch)
-        chars.length = 0
-        jamos.length = 0
-        step = 0
       }
-      return
     }
 
-    if (step === 1) {
-      if (isCompatVowel(ch)) {
-        chars.push(ch)
-        jamos.push(getJungseongFromCompat(ch))
-        step += 1
-      } else {
-        if (chars.length) {
-          result = result.concat(chars)
-        }
-        result.push(ch)
-        chars.length = 0
-        jamos.length = 0
-        step = 0
-      }
-      return
+    if (standbys.length > 1) {
+      result.push(composeCharacter(standbys))
+    } else if (compats.length) {
+      result = result.concat(compats)
+    } else {
+      result.push(curr)
     }
 
-    if (step === 2) {
-      if (isCompatConsonant(ch)) {
-        jamos.push(getJongseongFromCompat(ch))
-        result.push(composeCharacter(jamos))
-      } else {
-        result.push(composeCharacter(jamos))
-        result.push(ch)
-      }
-      chars.length = 0
-      jamos.length = 0
-      step = 0
-    }
-  })
-
-  if (jamos.length > 1) {
-    result.push(composeCharacter(jamos))
-  } else if (chars.length) {
-    result = result.concat(chars)
+    compats.length = 0
+    standbys.length = 0
+    index += 1
   }
 
   return result.join('')
@@ -217,6 +175,8 @@ function decomposeAsCompat (text) {
 }
 
 function inRangeOf (text, start, end) {
+  if (!text || !text.length) return false
+
   return Array.from(text).every(ch => {
     const codePoint = ch.codePointAt(0)
 
