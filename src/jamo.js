@@ -59,9 +59,9 @@ function composeCharacter (chars) {
     return chars.join('')
   }
 
-  const choseong = chars[0].codePointAt(0) - CHOSEONG_FIRST
-  const jungseong = chars[1].codePointAt(0) - JUNGSEONG_FIRST
-  const jongseong = chars.length > 2 ? chars[2].codePointAt(0) - JONGSEONG_FIRST + 1 : 0
+  const choseong = toCp(chars[0]) - CHOSEONG_FIRST
+  const jungseong = toCp(chars[1]) - JUNGSEONG_FIRST
+  const jongseong = chars.length > 2 ? toCp(chars[2]) - JONGSEONG_FIRST + 1 : 0
   const codePoint = SYLLABLE_FIRST + choseong * 21 * 28 + jungseong * 28 + jongseong
 
   return String.fromCodePoint(codePoint)
@@ -112,24 +112,24 @@ function composeWithCompat (...args) {
 
 function getChoseongFromCompat (text) {
   if (isCompatConsonant(text)) {
-    return String.fromCodePoint(CHOSEONG_FIRST + COMPAT_TO_CHOSEUNG[text.codePointAt(0) - COMPAT_CONSONANT_FIRST])
+    return String.fromCodePoint(CHOSEONG_FIRST + COMPAT_TO_CHOSEUNG[toCp(text) - COMPAT_CONSONANT_FIRST])
   }
 }
 
 function getJongseongFromCompat (text) {
   if (isCompatConsonant(text)) {
-    return String.fromCodePoint(JONGSEONG_FIRST + COMPAT_TO_JONGSEUNG[text.codePointAt(0) - COMPAT_CONSONANT_FIRST])
+    return String.fromCodePoint(JONGSEONG_FIRST + COMPAT_TO_JONGSEUNG[toCp(text) - COMPAT_CONSONANT_FIRST])
   }
 }
 
 function getJungseongFromCompat (text) {
   if (isCompatVowel(text)) {
-    return String.fromCodePoint(JUNGSEONG_FIRST + text.codePointAt(0) - COMPAT_VOWEL_FIRST)
+    return String.fromCodePoint(JUNGSEONG_FIRST + toCp(text) - COMPAT_VOWEL_FIRST)
   }
 }
 
 function decomposeAsOffset (text) {
-  const offset = text.codePointAt(0) - SYLLABLE_FIRST
+  const offset = toCp(text) - SYLLABLE_FIRST
   const jongseong = offset % 28
   const jungseong = ((offset - jongseong) / 28) % 21
   const choseong = (((offset - jongseong) / 28) - jungseong) / 21
@@ -178,7 +178,7 @@ function inRangeOf (text, start, end) {
   if (!text || !text.length) return false
 
   return Array.from(text).every(ch => {
-    const codePoint = ch.codePointAt(0)
+    const codePoint = toCp(ch)
 
     return codePoint >= start && codePoint <= end
   })
@@ -206,6 +206,10 @@ function isJungseong (text) {
 
 function isSyllable (text) {
   return inRangeOf(text, SYLLABLE_FIRST, SYLLABLE_LAST)
+}
+
+function toCp (text) {
+  return text.codePointAt(0)
 }
 
 export default {
