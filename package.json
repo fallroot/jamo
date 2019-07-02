@@ -4,7 +4,7 @@
   "description": "A simple utility for hangul jamo",
   "scripts": {
     "build": "babel src/jamo.js --out-dir build",
-    "test": "jest --watch test/*.js"
+    "test": "jest --coverage --watch test/*.js"
   },
   "keywords": ["hangul", "jamo", "korean"],
   "author": "Chookeun Moon <fallroot@gmail.com>",
