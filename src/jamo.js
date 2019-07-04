@@ -87,7 +87,7 @@ function composeWithCompat (...args) {
         index += 1
         curr = chars[index + 1]
 
-        if (isCompatConsonant(curr)) {
+        if (isCompatConsonant(curr) && !isCompatVowel(chars[index + 2])) {
           standbys.push(getJongseongFromCompat(curr))
           index += 1
         }

@@ -78,6 +78,10 @@ describe('composeWithCompat 함수는 호환성 자모를 받아 한글 음절�
     expect(jamo.composeWithCompat('ㄱ', 'ㅏ')).toEqual('가')
     expect(jamo.composeWithCompat('ㅎ', 'ㅣ')).toEqual('히')
   })
+
+  test('자음+모음 합성 후 자음+모음이 올 경우 종성으로 처리하지 않는다', () => {
+    expect(jamo.composeWithCompat('ㄱ', 'ㅏ', 'ㄱ', 'ㅏ')).toEqual('가가')
+  })
 })
 
 describe('decompose 함수는 한글 음절을 자모 단위로 분해한다', () => {
