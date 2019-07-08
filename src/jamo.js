@@ -16,7 +16,7 @@ const SYLLABLE_FIRST = 0xAC00
 const SYLLABLE_LAST = 0xD7AF
 
 function compose (...args) {
-  const chars = Array.from(args)
+  const chars = Array.from(flatten(args))
   const size = chars.length
   const standbys = []
   const result = []
@@ -68,7 +68,7 @@ function composeCharacter (chars) {
 }
 
 function composeWithCompat (...args) {
-  const chars = Array.from(args)
+  const chars = Array.from(flatten(args))
   const compats = []
   const standbys = []
   let index = 0
@@ -172,6 +172,14 @@ function decomposeAsCompat (text) {
     COMPAT_VOWEL_FIRST + offsets.jungseong,
     COMPAT_CONSONANT_FIRST + JONGSEONG_TO_COMPAT[offsets.jongseong - 1]
   ])
+}
+
+function flatten (arr) {
+  if (Array.prototype.flat) {
+    return arr.flat()
+  } else {
+    return arr.reduce((acc, val) => Array.isArray(val) ? acc.concat(flatten(val)) : acc.concat(val), [])
+  }
 }
 
 function inRangeOf (text, start, end) {
