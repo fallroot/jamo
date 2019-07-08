@@ -217,7 +217,12 @@ export default {
   composeWithCompat,
   decompose,
   decomposeAsCompat,
+  getChoseongFromCompat,
+  getJongseongFromCompat,
+  getJungseongFromCompat,
   isChoseong,
+  isCompatConsonant,
+  isCompatVowel,
   isJongseong,
   isJungseong,
   isSyllable
