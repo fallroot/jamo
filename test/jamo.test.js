@@ -1,4 +1,4 @@
-import jamo from '../src/jamo'
+const jamo = require('../dist/jamo')
 
 describe('isChoseong 함수는 초성 여부를 확인한다', () => {
   test('모든 문자가 초성일 경우에만 true를 돌려준다', () => {

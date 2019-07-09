@@ -3,29 +3,25 @@
   "version": "0.1.0",
   "description": "A simple utility for hangul jamo",
   "scripts": {
-    "build": "babel src/jamo.js --out-dir build",
+    "build": "webpack --mode production",
     "test": "jest --coverage --watch test/*.js"
   },
-  "keywords": ["hangul", "jamo", "korean"],
+  "keywords": [
+    "hangul",
+    "jamo",
+    "korean"
+  ],
   "author": "Chookeun Moon <fallroot@gmail.com>",
+  "main": "dist/jamo.js",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "babel-eslint": "^10.0.2",
+    "babel-loader": "^8.0.6",
     "jest": "^24.8.0",
-    "standard": "^12.0.1"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "modules": "umd"
-        }
-      ]
-    ]
+    "standard": "^12.0.1",
+    "webpack": "^4.35.3"
   },
   "standard": {
     "env": {
