@@ -222,6 +222,7 @@ function toCp (text) {
 
 export default {
   compose,
+  composeCharacter,
   composeWithCompat,
   decompose,
   decomposeAsCompat,
