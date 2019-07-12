@@ -1,7 +1,10 @@
 {
-  "name": "@fallroot/jamo",
+  "name": "jamo",
   "version": "0.1.0",
   "description": "A simple utility for hangul jamo",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "webpack --mode production",
     "test": "jest --coverage --watch test/*.js"
